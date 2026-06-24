@@ -817,4 +817,40 @@ h1, h2, h3, h4, h5, h6 {
   .narrative-container {
     padding: 40px 20px;
   }
+
+  .evidencias-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .evidencias-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .intro-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .narrative-text {
+    font-size: 1.1rem;
+  }
+
+  .header-container {
+    padding: 0 20px;
+  }
 }
