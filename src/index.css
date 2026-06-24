@@ -827,6 +827,72 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     text-align: center;
   }
+
+  .logo-text {
+    display: none;
+  }
+
+  /* Overrides for inline styles in App.jsx */
+  #video {
+    padding: 40px 20px !important;
+  }
+  #video > div {
+    padding: 30px 20px !important;
+  }
+  #video h2 {
+    font-size: 2.2rem !important;
+    margin-bottom: 30px !important;
+  }
+  #video > div > div {
+    gap: 30px !important;
+  }
+  #video p {
+    font-size: 1.2rem !important;
+  }
+  
+  .hero-content {
+    padding-left: 0 !important;
+    text-align: center !important;
+  }
+  .hero-content h1 {
+    font-size: 2.8rem !important;
+    text-align: center !important;
+  }
+  .hero-content p {
+    text-align: center !important;
+    margin: 0 auto 20px !important;
+  }
+  .hero-content .hero-buttons {
+    justify-content: center !important;
+    flex-wrap: wrap;
+  }
+
+  .intro-text {
+    padding: 30px !important;
+  }
+  .intro-text p {
+    font-size: 1.1rem !important;
+  }
+  
+  #buscador {
+    max-width: 100% !important;
+    padding: 15px !important;
+    margin-top: 30px !important;
+  }
+  #buscador form {
+    flex-direction: column !important;
+  }
+  #buscador form h3 {
+    width: 100%;
+    text-align: center;
+  }
+  #buscador form input {
+    width: 100%;
+  }
+  #buscador form button {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 576px) {
@@ -835,11 +901,11 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .hero-title {
-    font-size: 2.2rem;
+    font-size: 2.2rem !important;
   }
 
   .section-title {
-    font-size: 2rem;
+    font-size: 2rem !important;
   }
 
   .intro-stats {
@@ -852,5 +918,9 @@ h1, h2, h3, h4, h5, h6 {
 
   .header-container {
     padding: 0 20px;
+  }
+
+  .modal-content {
+    padding: 30px 20px !important;
   }
 }
