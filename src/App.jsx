@@ -711,13 +711,15 @@ const evidenciasData = [
 
   const renderConclusionParagraph = (pText, index) => {
     const { start, end } = conclusionOffsets[index];
+    let content = pText;
+    
     if (conclusionHighlightIndex >= start && conclusionHighlightIndex < end) {
       const localStart = conclusionHighlightIndex - start;
       const localLength = conclusionHighlightLength;
       const before = pText.substring(0, localStart);
       const highlighted = pText.substring(localStart, localStart + localLength);
       const after = pText.substring(localStart + localLength);
-      return (
+      content = (
         <>
           {before}
           <mark style={{ backgroundColor: 'var(--primary-orange)', color: 'white', borderRadius: '4px', padding: '0 2px' }}>{highlighted}</mark>
@@ -725,7 +727,29 @@ const evidenciasData = [
         </>
       );
     }
-    return pText;
+    
+    const isSpecialPhrase = pText.includes("Consideramos que uno de los aprendizajes más valiosos");
+    if (isSpecialPhrase) {
+      return (
+        <a 
+          href="#inicio" 
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer', borderBottom: '1px dashed var(--primary-orange)', transition: 'all 0.3s' }}
+          onMouseEnter={(e) => {
+            e.target.style.color = 'var(--primary-orange)';
+            e.target.style.borderBottomStyle = 'solid';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.color = 'inherit';
+            e.target.style.borderBottomStyle = 'dashed';
+          }}
+        >
+          {content}
+        </a>
+      );
+    }
+
+    return content;
   };
 
   const playConclusionAudio = () => {
