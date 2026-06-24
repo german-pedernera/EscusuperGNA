@@ -452,7 +452,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .evidencia-card .btn-secondary:hover {
-  background-color: var(--secondary-blue);
+  background-color: var(--primary-orange);
+  color: var(--text-light);
 }
 
 .evidencia-badge {
