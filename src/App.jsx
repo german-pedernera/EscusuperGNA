@@ -201,12 +201,13 @@ const evidenciasData = [
       const updatedMessages = [messageWithId, ...contactMessages];
       setContactMessages(updatedMessages);
       
-      fetch(form.action, {
+      fetch("https://formsubmit.co/ajax/perezdario16@gmail.com", {
         method: 'POST',
-        body: formData,
         headers: {
+          'Content-Type': 'application/json',
           'Accept': 'application/json'
-        }
+        },
+        body: JSON.stringify(data)
       });
     } catch (err) {
       console.error("Error adding message: ", err);
