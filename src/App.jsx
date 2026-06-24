@@ -112,6 +112,41 @@ const evidenciasData = [
   const [contactMessages, setContactMessages] = useState([]);
   const [openAccordion, setOpenAccordion] = useState(null);
 
+  const [installPromptEvent, setInstallPromptEvent] = useState(null);
+  const [showInstallModal, setShowInstallModal] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setInstallPromptEvent(e);
+      const hasSeenPrompt = localStorage.getItem('hasSeenInstallPrompt');
+      if (!hasSeenPrompt) {
+        setTimeout(() => setShowInstallModal(true), 2000); // Show after 2 seconds
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!installPromptEvent) return;
+    setShowInstallModal(false);
+    installPromptEvent.prompt();
+    const { outcome } = await installPromptEvent.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+    setInstallPromptEvent(null);
+    localStorage.setItem('hasSeenInstallPrompt', 'true');
+  };
+
+  const handleDismissInstall = () => {
+    setShowInstallModal(false);
+    localStorage.setItem('hasSeenInstallPrompt', 'true');
+  };
+
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -1149,6 +1184,24 @@ const evidenciasData = [
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style={{ width: '35px', height: '35px', fill: 'currentColor' }}><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zM223.9 414.7c-32.3 0-64-8.7-91.8-25.1l-6.6-3.9-68.1 17.9 18.2-66.4-4.3-6.8c-18-28.1-27.5-60.6-27.5-93.6 0-103.5 84.3-187.8 188-187.8 50.2 0 97.4 19.6 132.9 55.1 35.5 35.5 55.1 82.7 55.1 133-1 103.5-85.3 187.6-188.1 187.6zM326.8 284c-5.6-2.8-33.3-16.5-38.5-18.4-5.2-1.9-8.9-2.8-12.7 2.8-3.8 5.6-14.6 18.4-17.9 22.1-3.3 3.8-6.6 4.2-12.2 1.4-5.6-2.8-23.7-8.8-45.2-28-16.6-14.8-27.8-33.1-31.1-38.8-3.3-5.6-.4-8.6 2.4-11.4 2.5-2.5 5.6-6.6 8.4-9.9 2.8-3.3 3.8-5.6 5.6-9.4 1.9-3.8.9-7.1-.5-9.9-1.4-2.8-12.7-30.7-17.4-42-4.6-11-9.3-9.5-12.7-9.7-3.3-.2-7.1-.2-10.9-.2-3.8 0-9.9 1.4-15 7.1-5.2 5.6-19.8 19.3-19.8 47.1 0 27.8 20.3 54.7 23.1 58.4 2.8 3.8 39.8 60.8 96.5 85.2 13.5 5.8 24 9.3 32.2 11.9 13.6 4.3 26 3.7 35.8 2.2 11-1.7 33.3-13.6 38-26.8 4.7-13.2 4.7-24.5 3.3-26.8-1.4-2.3-5.2-3.7-10.8-6.5z"/></svg>
       </a>
+
+      {/* Install PWA Modal */}
+      {showInstallModal && (
+        <div className="modal-overlay" style={{ zIndex: 100000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="modal-content fade-up" style={{ maxWidth: '450px', textAlign: 'center', padding: '40px 30px', borderRadius: '25px', backgroundColor: 'var(--card-bg)', boxShadow: '0 25px 60px rgba(0,0,0,0.2)' }}>
+            <img src="/logo-escusuper.jpeg" alt="Logo" style={{ width: '80px', height: '80px', borderRadius: '15px', marginBottom: '20px', boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }} />
+            <h3 style={{ fontSize: '1.8rem', color: 'var(--primary-green)', marginBottom: '15px' }}>¡Instala nuestra App!</h3>
+            <p style={{ fontSize: '1.1rem', color: 'var(--text-dark)', marginBottom: '30px', lineHeight: '1.6' }}>Descarga la aplicación en tu celular o computadora para tener acceso directo y una mejor experiencia, sin necesidad de usar el navegador.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <button className="btn btn-primary" onClick={handleInstallClick} style={{ width: '100%', padding: '15px', fontSize: '1.1rem', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', border: 'none', cursor: 'pointer' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style={{width: '20px', height: '20px', fill: 'white'}}><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
+                Instalar Aplicación
+              </button>
+              <button className="btn btn-secondary" onClick={handleDismissInstall} style={{ width: '100%', padding: '15px', fontSize: '1.1rem', borderRadius: '15px', backgroundColor: '#f1f1f1', color: 'var(--text-muted)', border: 'none', cursor: 'pointer' }}>Quizás más tarde</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
