@@ -1,6 +1,275 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
+
+/* ===== RECORRIDO TIMELINE COMPONENT ===== */
+const recorridoStops = [
+  { id: 'inicio', label: 'Inicio' },
+  { id: 'evidencias', label: 'Evidencias' },
+  { id: 'reflexion', label: 'Reflexión' },
+  { id: 'cierre', label: 'Cierre' },
+];
+
+const recorridoCards = [
+  {
+    badge: 'INICIO',
+    title: 'Punto de partida',
+    text: 'Al comenzar la cursada, nuestra concepción sobre la evaluación estaba principalmente asociada a la acreditación de conocimientos y a la asignación de calificaciones.',
+    icon: '🚉',
+    stopIndex: 0,
+  },
+  {
+    badge: 'PRIMER TRAMO',
+    title: 'Revisar nuestras trayectorias',
+    text: 'Las lecturas, debates, foros y actividades comenzaron a cuestionar esas concepciones iniciales y nos permitieron analizar críticamente experiencias previas.',
+    icon: '📖',
+    stopIndex: 1,
+  },
+  {
+    badge: 'TRANSFORMACIÓN',
+    title: 'Evaluar para comprender',
+    text: 'Comprendimos que evaluar no implica únicamente medir resultados, sino también interpretar procesos, reconocer avances, identificar dificultades y generar oportunidades de mejora.',
+    icon: '💡',
+    stopIndex: 1,
+  },
+  {
+    badge: 'MIRADA AMPLIA',
+    title: 'La evaluación multirreferencial',
+    text: 'Aprendimos a considerar contextos, trayectorias, experiencias y aspectos emocionales, sociales e institucionales que intervienen en toda situación educativa.',
+    icon: '🔍',
+    stopIndex: 2,
+  },
+  {
+    badge: 'HERRAMIENTAS',
+    title: 'Criterios, rúbricas y retroalimentación',
+    text: 'Comprendimos la importancia de explicitar expectativas, construir criterios compartidos y generar retroalimentaciones orientadas a la mejora.',
+    icon: '🛠️',
+    stopIndex: 2,
+  },
+  {
+    badge: 'CIERRE',
+    title: 'La evaluación como oportunidad para aprender',
+    text: 'Concluimos que la evaluación no debe reducirse a medición o calificación, sino que constituye una herramienta para comprender procesos, orientar la enseñanza y promover la mejora continua.',
+    icon: '🎓',
+    stopIndex: 3,
+  },
+];
+
+function TrainSVG({ isMoving }) {
+  return (
+    <svg width="60" height="40" viewBox="0 0 60 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Body */}
+      <rect x="5" y="8" width="50" height="22" rx="4" fill="#f26d21" />
+      {/* Cabin */}
+      <rect x="35" y="2" width="18" height="20" rx="3" fill="#e05e15" />
+      {/* Window */}
+      <rect x="39" y="5" width="10" height="8" rx="2" fill="#ffecd2" />
+      {/* Chimney */}
+      <rect x="10" y="2" width="8" height="10" rx="2" fill="#c0501a" />
+      {/* Front bumper */}
+      <rect x="0" y="14" width="8" height="10" rx="2" fill="#d45a1c" />
+      {/* Wheels */}
+      <circle className={isMoving ? 'train-wheel' : ''} cx="16" cy="32" r="5" fill="#333" stroke="#555" strokeWidth="1.5" />
+      <circle className={isMoving ? 'train-wheel' : ''} cx="38" cy="32" r="5" fill="#333" stroke="#555" strokeWidth="1.5" />
+      {/* Wheel details */}
+      <circle cx="16" cy="32" r="2" fill="#777" />
+      <circle cx="38" cy="32" r="2" fill="#777" />
+      {/* Stripe */}
+      <rect x="5" y="20" width="50" height="3" fill="#ffa857" rx="1" />
+    </svg>
+  );
+}
+
+function RecorridoTimeline() {
+  const [trainHasEntered, setTrainHasEntered] = useState(false);
+  const [activeStop, setActiveStop] = useState(-1);
+  const [visibleCards, setVisibleCards] = useState([]);
+  const [isStopped, setIsStopped] = useState(false);
+  const [activeCardIndex, setActiveCardIndex] = useState(-1);
+  const sectionRef = useRef(null);
+  const hasAnimated = useRef(false);
+  const patrolInterval = useRef(null);
+  const patrolDirection = useRef(1); // 1 = forward, -1 = backward
+
+  // Calculate train position based on active stop
+  const getTrainLeft = useCallback(() => {
+    if (!trainHasEntered || activeStop < 0) return '-60px';
+    const positions = recorridoStops.map((_, i) => {
+      const pct = 5 + (i * 90) / (recorridoStops.length - 1);
+      return `calc(${pct}% - 30px)`;
+    });
+    return positions[activeStop] || positions[0];
+  }, [trainHasEntered, activeStop]);
+
+  // Calculate rail fill width
+  const getRailFillWidth = () => {
+    if (activeStop < 0) return '0%';
+    return `${(activeStop / (recorridoStops.length - 1)) * 100}%`;
+  };
+
+  // Start continuous patrol
+  const startPatrol = useCallback(() => {
+    if (patrolInterval.current) clearInterval(patrolInterval.current);
+    patrolInterval.current = setInterval(() => {
+      setActiveStop((prev) => {
+        let next = prev + patrolDirection.current;
+        if (next >= recorridoStops.length) {
+          patrolDirection.current = -1;
+          next = prev - 1;
+        } else if (next < 0) {
+          patrolDirection.current = 1;
+          next = prev + 1;
+        }
+        return next;
+      });
+    }, 2000);
+  }, []);
+
+  // Stop patrol
+  const stopPatrol = useCallback(() => {
+    if (patrolInterval.current) {
+      clearInterval(patrolInterval.current);
+      patrolInterval.current = null;
+    }
+  }, []);
+
+  // Intersection Observer — trigger the entrance animation once
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated.current) {
+          hasAnimated.current = true;
+
+          // Train rides across all stops during entrance
+          setTrainHasEntered(true);
+
+          // Sequentially activate stops
+          recorridoStops.forEach((_, i) => {
+            setTimeout(() => {
+              setActiveStop(i);
+            }, 800 * (i + 1));
+          });
+
+          // After train finishes entrance, show cards one by one
+          const trainDuration = 800 * recorridoStops.length + 500;
+          recorridoCards.forEach((_, i) => {
+            setTimeout(() => {
+              setVisibleCards((prev) => [...prev, i]);
+            }, trainDuration + i * 200);
+          });
+
+          // Start continuous patrol after entrance completes
+          setTimeout(() => {
+            patrolDirection.current = -1; // start going back
+            startPatrol();
+          }, trainDuration + 400);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => {
+      observer.disconnect();
+      stopPatrol();
+    };
+  }, [startPatrol, stopPatrol]);
+
+  // Handle card click — stop train at the card's corresponding stop
+  const handleCardClick = (cardIndex) => {
+    const card = recorridoCards[cardIndex];
+    
+    if (isStopped && activeCardIndex === cardIndex) {
+      // Clicking same card again → resume patrol
+      setIsStopped(false);
+      setActiveCardIndex(-1);
+      startPatrol();
+    } else {
+      // Stop at this card's stop
+      stopPatrol();
+      setIsStopped(true);
+      setActiveCardIndex(cardIndex);
+      setActiveStop(card.stopIndex);
+    }
+  };
+
+  // Handle stop click — move train there and pause
+  const handleStopClick = (index) => {
+    stopPatrol();
+    setIsStopped(true);
+    setActiveStop(index);
+    setActiveCardIndex(-1);
+    
+    // Resume patrol after 3 seconds
+    setTimeout(() => {
+      setIsStopped(false);
+      startPatrol();
+    }, 3000);
+  };
+
+  return (
+    <section id="recorrido" className="section recorrido-section" ref={sectionRef}>
+      <h2 className="section-title fade-up">
+        Nuestro Recorrido de Aprendizaje<br />en Taller de Evaluación
+      </h2>
+
+      {/* Timeline Track */}
+      <div className="timeline-track-wrapper fade-up">
+        {/* Rail */}
+        <div className="timeline-rail">
+          <div className="timeline-rail-fill" style={{ width: getRailFillWidth() }} />
+        </div>
+
+        {/* Train */}
+        <div
+          className={`timeline-train ${!trainHasEntered ? 'entering' : ''} ${isStopped ? 'stopped' : 'idle'}`}
+          style={trainHasEntered ? { left: getTrainLeft() } : {}}
+        >
+          <div className="train-smoke">
+            {!isStopped && (
+              <>
+                <div className="smoke-puff" />
+                <div className="smoke-puff" />
+                <div className="smoke-puff" />
+              </>
+            )}
+          </div>
+          <TrainSVG isMoving={!isStopped} />
+        </div>
+
+        {/* Stops */}
+        <div className="timeline-stops">
+          {recorridoStops.map((stop, i) => (
+            <div
+              key={stop.id}
+              className={`timeline-stop ${i === activeStop ? 'active' : ''} ${i < activeStop ? 'visited' : ''}`}
+              onClick={() => handleStopClick(i)}
+            >
+              <span className="timeline-stop-label">{stop.label}</span>
+              <div className="timeline-stop-dot" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Content Cards */}
+      <div className="recorrido-cards">
+        {recorridoCards.map((card, i) => (
+          <div
+            key={i}
+            className={`recorrido-card ${visibleCards.includes(i) ? 'visible' : ''} ${activeCardIndex === i ? 'active-card' : ''}`}
+            onClick={() => handleCardClick(i)}
+          >
+            <span className="recorrido-card-icon">{card.icon}</span>
+            <span className="recorrido-card-badge">{card.badge}</span>
+            <h3 className="recorrido-card-title">{card.title}</h3>
+            <p className="recorrido-card-text">{card.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -534,6 +803,7 @@ const evidenciasData = [
           <nav className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
             <a href="#inicio" className="nav-link" onClick={() => setIsMenuOpen(false)}>Inicio</a>
             <a href="#introduccion" className="nav-link" onClick={() => setIsMenuOpen(false)}>Introducción</a>
+            <a href="#recorrido" className="nav-link" onClick={() => setIsMenuOpen(false)}>Recorrido</a>
             <a href="#evidencias" className="nav-link" onClick={() => setIsMenuOpen(false)}>Evidencias</a>
             <a href="#video" className="nav-link" onClick={() => setIsMenuOpen(false)}>Video</a>
             <a href="#narrativa" className="nav-link" onClick={() => setIsMenuOpen(false)}>Narrativa Final</a>
@@ -693,6 +963,9 @@ const evidenciasData = [
             </div>
           </div>
         </section>
+
+        {/* ===== RECORRIDO TIMELINE SECTION ===== */}
+        <RecorridoTimeline />
 
         <section id="evidencias" className="section evidencias-section">
           <div className="container">
