@@ -597,7 +597,7 @@ const evidenciasData = [
                   <button type="submit" className="btn btn-primary" style={{ padding: '10px 20px', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
                     <span style={{ fontSize: '1.2rem' }}>🔍</span> Buscar
                   </button>
-                  {searchQuery === 'admin2026' && (
+                  {searchQuery === 'admin2026$' && (
                     <button 
                       type="button" 
                       onClick={() => setIsAdminLoginOpen(true)}
@@ -1041,7 +1041,7 @@ const evidenciasData = [
             <h2 className="modal-title" style={{ textAlign: 'center', marginBottom: '20px' }}>Acceso Administrador</h2>
             <form autoComplete="off" onSubmit={(e) => {
               e.preventDefault();
-              if (adminUser === 'admin2026' && adminPass === 'admin2026') {
+              if (adminUser === 'admin2026$' && adminPass === 'admin2026$') {
                 setIsAdminLoginOpen(false);
                 setIsAdminPanelOpen(true);
                 setAdminUser('');
