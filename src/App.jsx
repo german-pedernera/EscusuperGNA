@@ -1219,7 +1219,7 @@ const evidenciasData = [
             </div>
           </div>
           <div className="footer-bottom">
-            <p>&copy; {new Date().getFullYear()} Taller de Evaluación. Todos los derechos reservados.</p>
+            <p>&copy; {new Date().getFullYear()} Taller de Evaluación - Escuela Superior “GRL DON MANUEL MARÍA CALDERÓN”.</p>
           </div>
         </div>
       </footer>
