@@ -847,7 +847,7 @@ const evidenciasData = [
 
             <div className="hero-content animate-fade-in-up" style={{ textAlign: 'right', paddingLeft: '80px' }}>
               <h1 className="hero-title" style={{ textAlign: 'right' }}>
-                Portafolio de <br/>
+                Portafolio Digital de <br/>
                 <span>Aprendizaje</span>
               </h1>
               <p className="hero-description" style={{ marginLeft: 'auto', marginRight: 0, textAlign: 'right' }}>
