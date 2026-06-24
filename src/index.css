@@ -899,6 +899,24 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: center;
   }
 
+  /* Global mobile overflow fix */
+  body, html {
+    overflow-x: hidden !important;
+  }
+  .section, .container, main, section, div {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  .section-title {
+    width: auto !important;
+    max-width: 100% !important;
+    font-size: 1.5rem !important;
+  }
+
   /* Narrative section */
   #narrativa {
     padding: 40px 15px !important;
@@ -909,7 +927,7 @@ h1, h2, h3, h4, h5, h6 {
     max-height: 80vh;
   }
   #narrativa h2 {
-    font-size: 1.6rem !important;
+    font-size: 1.3rem !important;
     word-break: break-word;
   }
   #narrativa > div > div:first-child {
