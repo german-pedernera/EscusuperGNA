@@ -216,6 +216,7 @@ const evidenciasData = [
     setIsContactOpen(false);
     showAlert("¡Mensaje enviado con éxito!");
     form.reset();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const introParagraphs = [
