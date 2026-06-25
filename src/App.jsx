@@ -493,7 +493,7 @@ const evidenciasData = [
     "Al iniciar la cursada, nuestras concepciones sobre la evaluación estaban principalmente asociadas a la acreditación de conocimientos, la medición de resultados y la asignación de calificaciones. Sin embargo, las lecturas, los debates, los foros y las actividades desarrolladas a lo largo de la materia nos permitieron ampliar progresivamente esa mirada y comprender la evaluación desde una perspectiva más integral, entendiéndola como una herramienta para comprender procesos, orientar la enseñanza y favorecer el aprendizaje.",
     "Las evidencias seleccionadas reflejan distintos momentos de ese recorrido y permiten observar cómo fueron evolucionando nuestras ideas acerca de la evaluación. A través de ellas recuperamos conceptos vinculados con la evaluación como comprensión, la evaluación formativa, la evaluación multirreferencial, los criterios de evaluación, las rúbricas y la importancia de la retroalimentación en los procesos educativos.",
     "En este sentido, el portafolio se convierte en una herramienta de reflexión que nos permite tomar conciencia de nuestro propio aprendizaje, identificar avances, reconocer desafíos y proyectar futuras prácticas docentes coherentes con una concepción de la evaluación orientada al acompañamiento, la mejora continua y el aprendizaje significativo.",
-    "Somos un grupo integrado por: Raúl Dirie, Rubén Darío Pérez y Sergio Barrios, estudiantes del Profesorado Universitario."
+    "Somos un grupo integrado por: Raúl Dirie, Rubén Darío Pérez, Sergio Barrios y Daniel Rivero estudiantes del Profesorado Universitario."
   ];
 
   const paragraphOffsets = [];
